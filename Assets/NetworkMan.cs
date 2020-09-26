@@ -33,12 +33,14 @@ public class NetworkMan : MonoBehaviour
 
     public enum commands{
         NEW_CLIENT,
-        UPDATE
+        UPDATE,
+        DROPPED
     };
     
     [Serializable]
     public class Message{
         public commands cmd;
+        public Player player;
     }
     
     [Serializable]
@@ -50,7 +52,13 @@ public class NetworkMan : MonoBehaviour
             public float B;
         }
         public string id;
-        public receivedColor color;        
+        public receivedColor color;
+        public int posX;
+        public int posY;
+        public int posZ;
+        public bool spawned = false;
+        public GameObject playerCube;
+
     }
 
     [Serializable]
@@ -64,7 +72,14 @@ public class NetworkMan : MonoBehaviour
     }
 
     public Message latestMessage;
-    public GameState lastestGameState;
+    public GameState latestGameState;
+    public List<Player> connectedPlayers;
+    public GameObject myCube;
+
+
+   
+    
+
     void OnReceived(IAsyncResult result){
         // this is what had been passed into BeginReceive as the second parameter:
         UdpClient socket = result.AsyncState as UdpClient;
@@ -83,11 +98,39 @@ public class NetworkMan : MonoBehaviour
         try{
             switch(latestMessage.cmd){
                 case commands.NEW_CLIENT:
-                    //can add new players to player list here
+                    print("new client connected");
+
+                    latestGameState = JsonUtility.FromJson<GameState>(returnData);
+
+                    for (int i = 0; i < latestGameState.players.Length; i++)
+                    {
+
+                        if (!connectedPlayers.Contains(latestGameState.players[i]))
+                        {
+                            latestGameState.players[i].spawned = true;
+                            connectedPlayers.Add(latestGameState.players[i]);
+                        }
+
+                    }
                     break;
                 case commands.UPDATE:
-                    lastestGameState = JsonUtility.FromJson<GameState>(returnData);
-                    
+                    latestGameState = JsonUtility.FromJson<GameState>(returnData);
+                    for (int i = 0; i < latestGameState.players.Length; i++)
+                    {
+
+                        foreach(Player player in connectedPlayers)
+                        {
+                            if(player.id == latestGameState.players[i].id)
+                            {
+                                player.color.R = latestGameState.players[i].color.R;
+                                player.color.G = latestGameState.players[i].color.G;
+                                player.color.B = latestGameState.players[i].color.B;
+                            }
+                        }
+
+                    }
+                    break;
+                case commands.DROPPED:
                     break;
                 default:
                     Debug.Log("Error");
@@ -104,10 +147,31 @@ public class NetworkMan : MonoBehaviour
 
     void SpawnPlayers(){
 
+
+        foreach (Player player in connectedPlayers)
+        {
+            if (player.spawned == true)
+            {
+                GameObject cube = GameObject.Instantiate(myCube, new Vector3(player.posX, player.posY, player.posZ), Quaternion.identity);
+                cube.GetComponent<CubeScript>().id = player.id;
+                player.playerCube = cube;
+                player.spawned = false;
+
+            }
+        }
+        
+
+
     }
 
     void UpdatePlayers(){
 
+
+        foreach (Player player in connectedPlayers)
+        {
+            Renderer cubeRender = player.playerCube.GetComponent<Renderer>();
+            cubeRender.material.color = new Color(player.color.R, player.color.G, player.color.B);
+        }
     }
 
     void DestroyPlayers(){
