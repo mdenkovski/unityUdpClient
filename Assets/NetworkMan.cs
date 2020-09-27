@@ -139,7 +139,14 @@ public class NetworkMan : MonoBehaviour
                     }
                     break;
                 case commands.DROPPED:
-                    break;
+                    for (int i = 0; i < latestGameState.players.Length; i++)
+                    {
+                        if(latestGameState.players[i].id == latestMessage.player.id)
+                        {
+                            connectedPlayers.Remove(latestGameState.players[i]);
+                        }
+                    }
+                        break;
                 default:
                     Debug.Log("Error");
                     break;
