@@ -14,8 +14,8 @@ public class NetworkMan : MonoBehaviour
     {
         udp = new UdpClient();
         
-        // udp.Connect("ec2-18-220-46-6.us-east-2.compute.amazonaws.com", 12345);
-        udp.Connect("localhost", 12345);
+        udp.Connect("ec2-18-220-46-6.us-east-2.compute.amazonaws.com", 12345);
+        //udp.Connect("localhost", 12345);
 
         Byte[] sendBytes = Encoding.ASCII.GetBytes("connect");
       
@@ -75,7 +75,7 @@ public class NetworkMan : MonoBehaviour
     public GameState latestGameState;
     public List<Player> connectedPlayers;
     public GameObject myCube;
-
+    public List<Player> droppedPlayers;
 
    
     
@@ -130,6 +130,7 @@ public class NetworkMan : MonoBehaviour
                         {
                             if(player.id == latestGameState.players[i].id)
                             {
+                                //update current player list colours with the colours from the server
                                 player.color.R = latestGameState.players[i].color.R;
                                 player.color.G = latestGameState.players[i].color.G;
                                 player.color.B = latestGameState.players[i].color.B;
@@ -139,11 +140,12 @@ public class NetworkMan : MonoBehaviour
                     }
                     break;
                 case commands.DROPPED:
-                    for (int i = 0; i < latestGameState.players.Length; i++)
+                    foreach (Player player in connectedPlayers)
                     {
-                        if(latestGameState.players[i].id == latestMessage.player.id)
+                        if (player.id == latestMessage.player.id)
                         {
-                            connectedPlayers.Remove(latestGameState.players[i]);
+                            Debug.Log("found dropped player");
+                            droppedPlayers.Add(player);
                         }
                     }
                         break;
@@ -191,6 +193,20 @@ public class NetworkMan : MonoBehaviour
 
     void DestroyPlayers(){
 
+        //remove the dropped player from our conencted player list
+        foreach (Player droppedPlayer in droppedPlayers)
+        {
+            connectedPlayers.Remove(droppedPlayer);
+        }
+
+        //destroy the cube of the player
+       foreach (Player droppedPlayer in droppedPlayers)
+       {
+            Destroy(droppedPlayer.playerCube);
+       }
+       //clear the dropped players
+       droppedPlayers.Clear();
+
     }
     
     void HeartBeat(){
@@ -202,5 +218,10 @@ public class NetworkMan : MonoBehaviour
         SpawnPlayers();
         UpdatePlayers();
         DestroyPlayers();
+    }
+
+    void OnApplicationQuit()
+    {
+        OnDestroy();
     }
 }
