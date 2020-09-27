@@ -56,7 +56,7 @@ public class NetworkMan : MonoBehaviour
         public int posX;
         public int posY;
         public int posZ;
-        public bool spawned = false;
+        public bool spawned = true;
         public GameObject playerCube;
 
     }
@@ -100,14 +100,23 @@ public class NetworkMan : MonoBehaviour
                 case commands.NEW_CLIENT:
                     print("new client connected");
 
+                    
                     latestGameState = JsonUtility.FromJson<GameState>(returnData);
 
+                    //for every player in the current game state is there a player that we dont already have in our player list
                     for (int i = 0; i < latestGameState.players.Length; i++)
                     {
-
-                        if (!connectedPlayers.Contains(latestGameState.players[i]))
+                        bool playerFound = false;
+                        foreach (Player player in connectedPlayers)
                         {
-                            latestGameState.players[i].spawned = true;
+                            if(latestGameState.players[i].id == player.id)
+                            {
+                                playerFound = true;
+                            }
+
+                        }
+                        if(!playerFound) // the player in the latest game state is new and we need to add them
+                        {
                             connectedPlayers.Add(latestGameState.players[i]);
                         }
 
@@ -117,7 +126,6 @@ public class NetworkMan : MonoBehaviour
                     latestGameState = JsonUtility.FromJson<GameState>(returnData);
                     for (int i = 0; i < latestGameState.players.Length; i++)
                     {
-
                         foreach(Player player in connectedPlayers)
                         {
                             if(player.id == latestGameState.players[i].id)
