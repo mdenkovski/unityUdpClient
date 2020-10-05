@@ -336,6 +336,7 @@ MonoBehaviour:
     players: []
   connectedPlayers: []
   myCube: {fileID: 5715209654403163952, guid: 833459f09127dfe4faf41563d3b8c943, type: 3}
+  droppedPlayers: []
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -465,6 +466,7 @@ MonoBehaviour:
     players: []
   connectedPlayers: []
   myCube: {fileID: 5715209654403163952, guid: 833459f09127dfe4faf41563d3b8c943, type: 3}
+  droppedPlayers: []
 --- !u!4 &1077503327
 Transform:
   m_ObjectHideFlags: 0

@@ -131,9 +131,14 @@ public class NetworkMan : MonoBehaviour
                             if(player.id == latestGameState.players[i].id)
                             {
                                 //update current player list colours with the colours from the server
-                                player.color.R = latestGameState.players[i].color.R;
-                                player.color.G = latestGameState.players[i].color.G;
-                                player.color.B = latestGameState.players[i].color.B;
+                                //player.color.R = latestGameState.players[i].color.R;
+                                // player.color.G = latestGameState.players[i].color.G;
+                                //player.color.B = latestGameState.players[i].color.B;
+
+                                //update current player list positoins
+                                player.posX = latestGameState.players[i].posX;
+                                player.posY = latestGameState.players[i].posY;
+                                player.posZ = latestGameState.players[i].posZ;
                             }
                         }
 
@@ -183,11 +188,13 @@ public class NetworkMan : MonoBehaviour
 
     void UpdatePlayers(){
 
-
+        //update player position
         foreach (Player player in connectedPlayers)
         {
-            Renderer cubeRender = player.playerCube.GetComponent<Renderer>();
-            cubeRender.material.color = new Color(player.color.R, player.color.G, player.color.B);
+            //not changing colour anymore
+            //Renderer cubeRender = player.playerCube.GetComponent<Renderer>();
+            //cubeRender.material.color = new Color(player.color.R, player.color.G, player.color.B);
+            player.playerCube.transform.position = new Vector3(player.posX,  player.posY, player.posZ);
         }
     }
 
