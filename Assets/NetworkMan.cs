@@ -24,6 +24,8 @@ public class NetworkMan : MonoBehaviour
         udp.BeginReceive(new AsyncCallback(OnReceived), udp);
 
         InvokeRepeating("HeartBeat", 1, 1);
+
+        InvokeRepeating("UpdatePosition", 0.03333f, 0.03333f);
     }
 
     void OnDestroy(){
@@ -204,24 +206,12 @@ public class NetworkMan : MonoBehaviour
             //Renderer cubeRender = player.playerCube.GetComponent<Renderer>();
             //cubeRender.material.color = new Color(player.color.R, player.color.G, player.color.B);
 
-            //send server our own position
-            if (player.id == myId)
-            {
-                player.posX = player.playerCube.transform.position.x;
-                player.posY = player.playerCube.transform.position.y;
-                player.posZ = player.playerCube.transform.position.z;
-
-
-                string playerJSON = JsonUtility.ToJson(player);
-                string message = "update" + playerJSON;
-                Debug.Log(message);
-                Byte[] sendBytes = Encoding.ASCII.GetBytes(message);
-                udp.Send(sendBytes, sendBytes.Length);
-            }
-            else //update the remaining players positions
+            //update all the other players positions
+            if (player.id != myId)
             {
                 player.playerCube.transform.position = new Vector3(player.posX, player.posY, player.posZ);
             }
+           
         }
     }
 
@@ -246,6 +236,27 @@ public class NetworkMan : MonoBehaviour
     void HeartBeat(){
         Byte[] sendBytes = Encoding.ASCII.GetBytes("heartbeat");
         udp.Send(sendBytes, sendBytes.Length);
+    }
+
+    void UpdatePosition()
+    {
+        foreach (Player player in connectedPlayers)
+        {
+            if (player.id == myId) //find our player
+            {
+
+                player.posX = player.playerCube.transform.position.x;
+                player.posY = player.playerCube.transform.position.y;
+                player.posZ = player.playerCube.transform.position.z;
+
+
+                string playerJSON = JsonUtility.ToJson(player);
+                string message = "update" + playerJSON;
+                //Debug.Log(message);
+                Byte[] sendBytes = Encoding.ASCII.GetBytes(message);
+                udp.Send(sendBytes, sendBytes.Length);
+            }
+        }
     }
 
     void Update(){
