@@ -53,9 +53,9 @@ public class NetworkMan : MonoBehaviour
         }
         public string id;
         public receivedColor color;
-        public int posX;
-        public int posY;
-        public int posZ;
+        public float posX = 0;
+        public float posY = 0;
+        public float posZ = 0;
         public bool spawned = true;
         public GameObject playerCube;
 
@@ -74,8 +74,10 @@ public class NetworkMan : MonoBehaviour
     public Message latestMessage;
     public GameState latestGameState;
     public List<Player> connectedPlayers;
-    public GameObject myCube;
+    public string myId = "";
+    public GameObject multiplayerCube;
     public List<Player> droppedPlayers;
+
 
    
     
@@ -101,6 +103,12 @@ public class NetworkMan : MonoBehaviour
                     print("new client connected");
 
                     
+                    if(myId == "")
+                    {
+                        myId = latestMessage.player.id;
+                        Debug.Log("My id is:" + myId);
+                    }
+
                     latestGameState = JsonUtility.FromJson<GameState>(returnData);
 
                     //for every player in the current game state is there a player that we dont already have in our player list
@@ -112,6 +120,7 @@ public class NetworkMan : MonoBehaviour
                             if(latestGameState.players[i].id == player.id)
                             {
                                 playerFound = true;
+                                
                             }
 
                         }
@@ -174,7 +183,7 @@ public class NetworkMan : MonoBehaviour
         {
             if (player.spawned == true)
             {
-                GameObject cube = GameObject.Instantiate(myCube, new Vector3(player.posX, player.posY, player.posZ), Quaternion.identity);
+                GameObject cube = GameObject.Instantiate(multiplayerCube, new Vector3(player.posX, player.posY, player.posZ), Quaternion.identity);
                 cube.GetComponent<CubeScript>().id = player.id;
                 player.playerCube = cube;
                 player.spawned = false;
@@ -194,7 +203,25 @@ public class NetworkMan : MonoBehaviour
             //not changing colour anymore
             //Renderer cubeRender = player.playerCube.GetComponent<Renderer>();
             //cubeRender.material.color = new Color(player.color.R, player.color.G, player.color.B);
-            player.playerCube.transform.position = new Vector3(player.posX,  player.posY, player.posZ);
+
+            //send server our own position
+            if (player.id == myId)
+            {
+                player.posX = player.playerCube.transform.position.x;
+                player.posY = player.playerCube.transform.position.y;
+                player.posZ = player.playerCube.transform.position.z;
+
+
+                string playerJSON = JsonUtility.ToJson(player);
+                string message = "update" + playerJSON;
+                Debug.Log(message);
+                Byte[] sendBytes = Encoding.ASCII.GetBytes(message);
+                udp.Send(sendBytes, sendBytes.Length);
+            }
+            else //update the remaining players positions
+            {
+                player.playerCube.transform.position = new Vector3(player.posX, player.posY, player.posZ);
+            }
         }
     }
 

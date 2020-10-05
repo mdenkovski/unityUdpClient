@@ -285,7 +285,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 775130657}
-  - component: {fileID: 775130658}
+  - component: {fileID: 775130656}
   m_Layer: 0
   m_Name: NetworkMan
   m_TagString: Untagged
@@ -293,21 +293,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &775130657
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 775130655}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &775130658
+--- !u!114 &775130656
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -330,13 +316,29 @@ MonoBehaviour:
       posX: 0
       posY: 0
       posZ: 0
-      spawned: 0
+      spawned: 1
       playerCube: {fileID: 0}
   latestGameState:
     players: []
   connectedPlayers: []
-  myCube: {fileID: 5715209654403163952, guid: 833459f09127dfe4faf41563d3b8c943, type: 3}
+  myId: 
+  multiplayerCube: {fileID: 5715209654403163952, guid: 833459f09127dfe4faf41563d3b8c943,
+    type: 3}
   droppedPlayers: []
+--- !u!4 &775130657
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775130655}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -465,7 +467,9 @@ MonoBehaviour:
   latestGameState:
     players: []
   connectedPlayers: []
-  myCube: {fileID: 5715209654403163952, guid: 833459f09127dfe4faf41563d3b8c943, type: 3}
+  myId: 
+  multiplayerCube: {fileID: 5715209654403163952, guid: 833459f09127dfe4faf41563d3b8c943,
+    type: 3}
   droppedPlayers: []
 --- !u!4 &1077503327
 Transform:
